@@ -1,0 +1,15 @@
+{
+	"name": "Zakum Helmet (1)",
+	"price": 60000000,
+	"slots": 10,
+	"attributes": {
+		"str": 15,
+		"dex": 15,
+		"int": 25,
+		"luk": 15,
+		"accuracy": 20,
+		"avoidability": 20,
+		"mdef": 150,
+		"wdef": 150
+	}
+}

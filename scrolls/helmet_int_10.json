@@ -3,5 +3,7 @@
 	"price": 2000000,
 	"chance_success": 0.1,
 	"chance_destroy": 0.0,
-	"int": 3
+	"attributes": {
+		"int": 3
+	}
 }
