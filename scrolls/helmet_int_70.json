@@ -1,0 +1,7 @@
+{
+	"name": "Scroll For Helmet For Int 70%",
+	"price": 8000000,
+	"chance_success": 0.7,
+	"chance_destroy": 0.5,
+	"int": 2
+}
