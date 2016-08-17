@@ -48,10 +48,10 @@ class Attribute(object):
 
 class AbstractItem(object):
 
-	def __init__(self, name=None, attributes={}, price=None):
-		self._attributes = attributes
+	def __init__(self, name=None, price=None, attributes={}):
 		self._name = name
 		self._price = price
+		self._attributes = attributes
 
 	def _get_name(self):
 		return self._name
@@ -60,6 +60,14 @@ class AbstractItem(object):
 		self._name = new_name
 
 	name = property(_get_name, _set_name)
+
+	def _get_price(self):
+		return self._price
+
+	def _set_price(self, new_price):
+		self._price = new_price
+
+	price = property(_get_price, _set_price)
 
 
 	def _get_attributes(self):
@@ -70,18 +78,20 @@ class AbstractItem(object):
 
 	attributes = property(_get_attributes, _set_attributes)
 
-	def _get_price(self):
-		return self._price
+	def __repr__(self):
+		return "name: {}, price:{}, attributes:{}".format(self._name, self._price, "attr")
 
-	def _set_price(self, new_price):
-		self._price = new_price
-
-	price = property(_get_price, _set_price)
+	__str__ = __repr__
 
 class Equip(AbstractItem):
 	def __init__(self):
 		AbstractItem.__init__(self)
 		self._slots = None
+
+	def __repr__(self):
+		return "{}, slots:{}".format(AbstractItem.__str__(self), self._slots)
+
+	__str__ = __repr__
 
 class Scroll(AbstractItem):
 	def __init__(self):
@@ -104,5 +114,10 @@ class Scroll(AbstractItem):
 		self._chance_destroy = new_chance_destroy
 		
 	chance_destroy = property(_get_chance_destroy, _set_chance_destroy)
+
+	def __repr__(self):
+		return "{}, chance_success:{}, chance_destroy:{}".format(AbstractItem.__str__(self), self._chance_success, self._chance_destroy)
+
+	__str__ = __repr__
 
 # vim: tabstop=4 expandtab shiftwidth=4 softtabstop=4

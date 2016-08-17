@@ -1,23 +1,32 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
+from pprint import pprint
+import json
+import os
+
 from maple import Scroll, Equip, Attribute
+
+SCROLLS_DIRECTORY = 'scrolls'
 
 def main():
 	print 'Welcome to Dimitars Ding Dong Scroll Script'
-	original_stat_value = 0
-	target_stat_value = 10
 
-	my_scroll = Scroll()
-	my_scroll.name = "Scroll for helmet for int 60%"
-	my_scroll.chance_success = 0.6
-	my_scroll.chance_destroy = 0
-	my_scroll.price = 14,000,000
 
-	#my_attribute = Attribute("int", 2)
-	my_scroll.attributes['int'] = 2
+	scrolls = []
 
-	print my_scroll.attributes
+	# Read through all our scroll files and create scroll objects from them
+	available_scroll_files = os.listdir(SCROLLS_DIRECTORY)
+	for scroll_file in available_scroll_files:
+		with open(os.path.join(SCROLLS_DIRECTORY, scroll_file)) as scroll_data:
+			scroll_json = json.load(scroll_data)
+			new_scroll = Scroll()
+			for attr, value in scroll_json.iteritems():
+				setattr(new_scroll, attr, value)
+			scrolls.append(new_scroll)
+
+
+	pprint(scrolls)
 
 if __name__ == '__main__':
 	main()
