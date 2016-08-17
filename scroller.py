@@ -40,6 +40,7 @@ def parse_input_file(filename, input_object):
 
 	return input_object
 
+
 def main(argv):
 	args = process_arguments(argv)
 
@@ -69,10 +70,12 @@ def main(argv):
 		print "There was an error trying to {}, make sure it exists".format(args.output_equip)
 		return 2
 
+	delta_equip = Equip.compute_delta(input_equip, output_equip)
 
 	pprint(scrolls)
 	pprint(input_equip)
 	pprint(output_equip)
+	pprint(delta_equip)
 	return 0
 
 if __name__ == '__main__':

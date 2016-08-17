@@ -52,7 +52,30 @@ class Equip(AbstractItem):
 		self._slots = new_slots
 
 	slots = property(_get_slots, _set_slots)
-	
+
+	@staticmethod
+	def compute_delta(lhs, rhs):
+		delta = Equip()
+		delta.name = "delta"
+		delta.price = rhs.price - lhs.price
+		delta.slots = rhs.slots - lhs.slots
+
+		# Go over the left hand attributes and compute their deltas
+		for attr, value in lhs.attributes.iteritems():
+			value = -value
+			if attr in rhs.attributes:
+				value += rhs.attributes[attr]
+
+			if value > 0:
+				delta.attributes[attr] = value
+
+		# Do the same for the right hand
+		for attr, value in rhs.attributes.iteritems():
+			if attr not in lhs.attributes:
+				delta.attributes[attr] = value
+
+		return delta
+
 	def __repr__(self):
 		return '{}, slots:{}'.format(AbstractItem.__str__(self), self._slots)
 
