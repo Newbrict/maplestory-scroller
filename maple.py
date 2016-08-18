@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-__all__ = ['Scroll', 'Equip'] 
+import copy
+
+__all__ = ['Scroll', 'Equip', 'ScrollOutcome'] 
 
 class AbstractItem(object):
 
@@ -76,8 +78,71 @@ class Equip(AbstractItem):
 
 		return delta
 
+	def scroll_outcomes(self, scroll):
+		outcomes = []
+
+		if self._slots == 0:
+			return outcomes
+
+		# The case where the scroll succeeds
+		success_equip = copy.deepcopy(self)
+		success_equip.slots -= 1
+
+		for attr, value in scroll.attributes.iteritems():
+			cur_attr_value = success_equip.attributes.get(attr, 0)
+			success_equip.attributes[attr] = cur_attr_value + value
+
+		success_outcome = ScrollOutcome()
+		success_outcome.equip = success_equip
+		success_outcome.probability = scroll.chance_success
+
+		outcomes.append(success_outcome)
+
+		# The case where the scroll fails
+		fail_equip = copy.deepcopy(self)
+		fail_equip.slots -= 1
+		fail_outcome = ScrollOutcome()
+		fail_outcome.equip = fail_equip
+		fail_outcome.probability = 1 - scroll.chance_success
+
+		outcomes.append(fail_outcome)
+
+		# The case where the scroll fails, and then is destroyed
+		destroy_outcome = ScrollOutcome()
+		destroy_outcome.probability = (1 - scroll.chance_success) * scroll.chance_destroy
+
+		outcomes.append(destroy_outcome)
+
+		return outcomes
+
 	def __repr__(self):
 		return '{}, slots:{}'.format(AbstractItem.__str__(self), self._slots)
+
+	__str__ = __repr__
+
+class ScrollOutcome(object):
+	def __init__(self):
+		self._equip = None
+		self._probability = None
+
+	def _get_equip(self):
+		return self._equip
+
+	def _set_equip(self, new_equip):
+		self._equip = new_equip
+
+	equip = property(_get_equip, _set_equip)
+
+	def _get_probability(self):
+		return self._probability
+
+	def _set_probability(self, new_probability):
+		self._probability = new_probability
+
+	probability = property(_get_probability, _set_probability)
+
+	def __repr__(self):
+		return '{}, probability:{}'.format(self._equip, self._probability)
 
 	__str__ = __repr__
 

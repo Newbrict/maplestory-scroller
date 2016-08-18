@@ -8,7 +8,11 @@ import argparse
 
 from pprint import pprint
 
-from maple import Scroll, Equip
+from maple import Scroll, Equip, ScrollOutcome
+from tree import Node
+
+#TODO maybe take this in as a command line argument, or instead limit by total probability
+MAX_TREE_DEPTH = 5
 
 def process_arguments(argv):
 	parser = argparse.ArgumentParser(description='Maplestory scroll cruncher')
@@ -40,6 +44,15 @@ def parse_input_file(filename, input_object):
 
 	return input_object
 
+def make_outcome_node(outcome, parent):
+	# adjust the probability by the parent's
+	outcome.probability *= parent.value.probability
+
+	node = Node()
+	node.value = outcome
+	node.parent = parent
+
+	return node
 
 def main(argv):
 	args = process_arguments(argv)
@@ -70,12 +83,45 @@ def main(argv):
 		print "There was an error trying to {}, make sure it exists".format(args.output_equip)
 		return 2
 
-	delta_equip = Equip.compute_delta(input_equip, output_equip)
+	#delta_equip = Equip.compute_delta(input_equip, output_equip)
 
-	pprint(scrolls)
-	pprint(input_equip)
-	pprint(output_equip)
-	pprint(delta_equip)
+	# Setup the root of our probability tree
+	input_outcome = ScrollOutcome()
+	input_outcome.equip = input_equip
+	input_outcome.probability = 1
+
+	outcome_tree_root = Node()
+	outcome_tree_root.value = input_outcome
+
+	outcome_tree_leaves = [outcome_tree_root]
+
+	for iteration in xrange(MAX_TREE_DEPTH):
+		current_leaves = outcome_tree_leaves
+		new_leaves = []
+		for leaf in current_leaves:
+			equip = leaf.value.equip
+
+			# TODO don't actually skip dark scroll boom booms
+			if equip is None:
+				continue
+
+			# Get the possible outcomes from our scrolls
+			outcomes = []
+			for scroll in scrolls:
+				outcomes += equip.scroll_outcomes(scroll)
+
+			# make a child node for each outcome
+			for out in outcomes:
+				new_node = make_outcome_node(out, leaf)
+
+				# add this child to the current leaf
+				leaf.add_children(new_node)
+				new_leaves.append(new_node)
+
+		outcome_tree_leaves = new_leaves
+
+	pprint(outcome_tree_leaves)
+
 	return 0
 
 if __name__ == '__main__':
